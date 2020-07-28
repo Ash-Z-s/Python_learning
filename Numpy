@@ -281,48 +281,184 @@ arr.var()
 arr.argmin()
 arr.argmax()#最小值和最大值的位置
 
+#//
+
+#布尔值数组的方法
+arr= np.random.randn(100)
+(arr > 0).sum() 	#计算正值的个数
+
+bools = np.array([False, False, True, False])
+bools.any()		#检查布尔值数组是否至少含有一个True
+bools.all()		#检查布尔值数组是否每个值都是True
+#这些方法也可适用于非布尔值数组，所有非0元素都按照True来处理
+
+#//
+
+#排序
+arr = np.random.randn(6)
+arr
+
+arr.sort()
+arr		#数组元素的顺序已经改变
+
+arr = np.random.randn(5,3)
+arr
+
+arr.sort(1)	#对数组按照第0行的大小，重新对列排序
+arr
+
+large_arr = np.random.randn(1000)
+large_arr.sort()
+large_arr[int(0.05 *len(large_arr))]  #5% quantile
+#//
+
+#唯一值与其他集合逻辑
+names = np.array(['Bob','Joe','Will','Bob','Will','Joe','Joe'])
+np.unique(names)		#返回数组中唯一值排序后形成的数组
+
+ints = np.array([3,3,3,2,2,1,1,4,4])
+np.unique(ints)		
+
+#np.unique 和纯python对比
+sorted(set(names))
+##
+values = np.array([6,0,0,3,2,5,6])
+np.in1d(values,[2,3,6])		#检查一个数组中的值，是否在另外一个数组中，并返回一个布尔值数组
+
+##numpy中集合函数：
+##unique（x） 计算x的唯一值，并排序
+##intersect1d(x,y) 计算x，y的交集，并排序
+##union1d(x,y)  计算x，y的并集，并排序
+##in1d(x,y)  计算x中的元素是否包含在y中，并返回一个布尔值数组
+##setdiff1d（x，y） 差集，在x中但不在y中的x的元素
+##setxor1d（x，y）	 异或集，在x或y中，但不属于x和y的交集的元素
+#//
+
+#使用数组进行文件输入和输出
+arr = np.arange(10)
+np.save('some_arry',arr)	#如果文件存放路径中没写 .npy 时，后缀名会被自动加上。
+np.laod('somg_array')		#硬盘上的数组可以直接使用np.laod进行载入
+np.savez('array_archive.npz',a = arr, b = arr)		#可以使用np.savez 并将数组作为参数传递给该函数，用于在未压缩文件中保存多个数组
+arch = np.laod('array_archive.npz')	#当载入一个npz文件的时候，你会获得一个字典型的对象，并通过该对象很方便的载入单个数组
+arch['b']
+
+np.savez_compressed('array_compressed.npz',a = arr,b=arr) #如果你想讲数据存入已经压缩的文件
+
+#//
+
+#线性代数
+x = np.array([[1,2,3.],[4,5,6.]])	#2*3
+y = np.array([[6.,23.],[-1,7],[8,9]])	#3*2
+x
+y
+
+##点乘积（矩阵乘积）XY
+x.dot(y)
+np.dot(x,y)
+x @ y
+
+np.dot(x,np.ones(3)) #一个二维数组与一个长度合适的一维数组矩阵乘积，结果是一个一维数组
+
+from numpy.linalg import inv, qr
+X = np.random.randn(5,5)
+mat = X.T.dot(X)	#求X矩阵的转置与X矩阵的点乘积
+inv(mat)	#求逆
+mat.dot(inv(mat))	#结果为单位阵
+q, r = qr(mat)	#计算Q,R 分解
+###常用numpy.linalg函数
+#diag	 将一个方阵的对角（或非对角）元素作为一维数组返回，或者将一维数组转换成一个方阵，并且在非对角线上有0点
+#dot 	 矩阵点乘
+#trace	 计算对角线元素和
+#det 	 计算矩阵的行列式
+#eig	 计算方阵的特征值和特征向量
+#inv	 计算方阵的逆矩阵
+#pinv	 计算矩阵的moore-penrose 伪逆
+#qr 	 计算QR分解
+#svd	 计算奇异值分解
+#solve	 求解x的线性系统Ax = b，其中A是方阵
+#lstsq	 计算Ax = b，的最小二乘解
+#//
+
+#伪随机数生成
+samples = np.random.normal(size = (4,4))
+samples		#numpy.random 模块弥补了python内建random模块的不足，可以高效生成多种概率分布下的完整样本值数组
+
+from random import normalvariate 
+N = 100000		#python内建random模块，一次只能生成一个值
+
+%timeit samples = [normalvariate(0,1) for _ in range(N)]
+%timeit np.random.normal(size = N)
+
+np.random.seed(1234)	#这些伪随机数书友随机数种子生成的，可以通过np.random.seed 来改变种子
+
+rng = np.random.randomState(1234)	 #np.random里的数据生成函数使用一个全局种子，为了避免全局状态，你可以使用该函数该函数创建一个独立于其他随机数据的数据生成器
+rng.randn(10)
+
+##np.random中的函数
+##seed
+##permutation	 返回一个序列的随机排列，或者返回一个乱序的整数范围序列
+##shuffle	 随机排列一个序列
+##rand	 	 从均匀分布中出去样本
+##randint	 根据给定的由低到高的范围抽取随机整数
+##randn	 	 从均值0，方差1的正态分布中抽取样本
+##binomial	 从二项分布抽取样本
+##normal
+##beta
+##chisquare
+##gamma
+##uniform	 从均匀[0,1)分布中抽取样本
+
+#//
+
+#随机漫步
+{
+#考虑一个简单的随机漫步，从0开始，步进为1或者-1，且两者概率相同
+#python内建函数实现
+import random
+position = 0
+walk = [position]
+step = 1000
+for i in range(step):
+    step = 1 if random.randint(0,1) else -1
+    position += step
+    walk.append(position)
+plt.plot(walk[:100])
+}
+{
+#用numpy计算
+nsteps = 1000
+draws = np.random.randint(0,2,size = nsteps)
+steps = np.where(draws > 0,1,-1)
+walk = steps.cumsum()
+
+walk.min()	#统计一些漫步轨道上的最大值，最小值
+walk.max()
+
+#找出何时第一次连续往一个方向走了十步
+(np.abs(walk) >= 10).argmax()	#argmax效率不高，因为它总是完整的扫描整个数组，在这个例子里，一旦发现TRUE就可以停下了
+}
+
+{
+#一次性模拟多次随机漫步
+nwalks = 1000
+nsteps = 2000
+draws = np.random.randint(0,2,size= (nwalks,nsteps)) #0或1
+steps = np.where(draws >0,1,-1)
+walks = steps.cumsum(1)		#1表示按行做累加（0表示按列）
+walks
+walks.max()
+walks.min()
+
+hist30 = (np.abs(walks) >= 30).any(1)	#表示判断每行是否 均存在随机漫步超过30步的
+hist30
+hist30.sum()
+
+crossing_times = (np.abs(walks[hist30]) >= 30).argmax(1)	 #使用布尔值数组，选出步数超过30步所在的行，并使用argmax从轴1上，获取其第一次穿越的时间
+crossing_times.mean()
+}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##本笔记为学习《利用python进行数据分析》-Wes McKinney 所做，仅提供参考
 
 
